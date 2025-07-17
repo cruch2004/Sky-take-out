@@ -5,9 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "sky.jwt")
+@ConfigurationProperties(prefix = "sky.jwt")//spring boot 注解
 @Data
-public class JwtProperties {
+public class JwtProperties {//配置属性类
 
     /**
      * 管理端员工生成jwt令牌相关配置
