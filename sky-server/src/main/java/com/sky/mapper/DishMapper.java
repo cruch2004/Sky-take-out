@@ -21,6 +21,7 @@ public interface DishMapper {
      * 插入菜品数据
      * @param dish
      */
-    @AutoFill(value = OperationType.INSERT) // 公共字段自动填充 只需要添加注解即可
+    @AutoFill(value = OperationType.INSERT)
     void insert(Dish dish);
 }
+
