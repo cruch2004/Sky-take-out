@@ -188,4 +188,14 @@ public class DishServiceImpl implements DishService {
 
         return dishVOList;
     }
+
+    /**
+     * 修改菜品售卖状态
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        dishMapper.startOrStop(status,id);
+    }
 }
