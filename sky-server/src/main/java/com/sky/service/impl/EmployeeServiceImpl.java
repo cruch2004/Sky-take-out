@@ -155,7 +155,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
 
-        System.out.println("获取当前线程id:"+Thread.currentThread().getId());
+//        System.out.println("获取当前线程id:"+Thread.currentThread().getId());
 //        employee.setUpdateUser(BaseContext.getCurrentId());
 //        employee.setUpdateTime(LocalDateTime.now());
 

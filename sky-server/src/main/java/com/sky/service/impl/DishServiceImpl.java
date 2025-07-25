@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,8 +35,6 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
-    @Autowired
-    private DishService dishService;
 
     /**
      * 新增菜品和对应的口味
@@ -87,7 +86,7 @@ public class DishServiceImpl implements DishService {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
         }
-        // 判断套餐中时候包含当前菜品
+        // 判断套餐中是否包含当前菜品
         List<Long> SetmealIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
         if (SetmealIds != null && SetmealIds.size() > 0) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
@@ -148,5 +147,21 @@ public class DishServiceImpl implements DishService {
             });
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE) // 查找当前状态为起售状态的菜品
+                .build();
+        List<Dish> list = dishMapper.list(dish);
+        log.info(list.toString());
+        return dishMapper.list(dish);
     }
 }
