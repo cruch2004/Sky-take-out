@@ -80,12 +80,20 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
      */
     @Override
     public List<ShoppingCart> showShoppingCart() {
-        // 获取到当前微信用户的ID
         Long userId = BaseContext.getCurrentId();
         ShoppingCart shoppingcart = ShoppingCart.builder()
                 .userId(userId)
                 .build();
         return shoppingCartMapper.list(shoppingcart);
+    }
+
+    /**
+     * 清空购物车
+     */
+    @Override
+    public void cleanShoppingCart() {
+        Long userId = BaseContext.getCurrentId();
+        shoppingCartMapper.deleteByUserId(userId);
     }
 
 }
