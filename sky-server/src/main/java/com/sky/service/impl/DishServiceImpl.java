@@ -198,4 +198,14 @@ public class DishServiceImpl implements DishService {
     public void startOrStop(Integer status, Long id) {
         dishMapper.startOrStop(status,id);
     }
+
+    /**
+     * 根据dish_id 查询dish对象
+     * @param id
+     * @return
+     */
+    @Override
+    public Dish getById(Long id) {
+        return dishMapper.getById(id);
+    }
 }

@@ -29,7 +29,6 @@ public class DishController {
 
     /**
      * 新增菜品
-     *
      * @param dishDto
      * @return
      */
@@ -55,7 +54,6 @@ public class DishController {
 
     /**
      * 批量删除菜品
-     *
      * @param ids
      * @return
      */
@@ -74,7 +72,6 @@ public class DishController {
 
     /**
      * 根据id查询菜品和对应的口味数据
-     *
      * @param id
      * @return
      */
@@ -107,7 +104,6 @@ public class DishController {
 
     /**
      * 根据分类id查询菜品
-     *
      * @param categoryId
      * @return
      */
@@ -120,7 +116,6 @@ public class DishController {
 
     /**
      * 修改菜品售卖状态
-     *
      * @param status
      * @param id
      * @return
