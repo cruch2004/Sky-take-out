@@ -19,7 +19,6 @@ public interface ShoppingCartMapper {
 
     /**
      * 根据id修改商品数量
-     *
      * @param cart
      */
     @Update("update shopping_cart set number = #{number} where id = #{id}")
@@ -27,7 +26,6 @@ public interface ShoppingCartMapper {
 
     /**
      * 插入购物车数据
-     *
      * @param shoppingCart
      */
     @Insert("insert into shopping_cart(name,user_id,dish_id,setmeal_id,dish_flavor,number,amount,image,create_time) " +
@@ -40,4 +38,11 @@ public interface ShoppingCartMapper {
      */
     @Delete("delete from shopping_cart where user_id = #{userId}")
     void deleteByUserId(Long userId);
+
+    /**
+     * 减少购物车中商品数量
+     * @param id
+     */
+    @Delete("delete from shopping_cart where id = #{id}")
+    void decreaseById(Long id);
 }
