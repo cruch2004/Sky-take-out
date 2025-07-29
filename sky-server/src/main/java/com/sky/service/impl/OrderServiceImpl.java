@@ -21,6 +21,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -56,6 +57,9 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 提交订单
@@ -116,7 +120,19 @@ public class OrderServiceImpl implements OrderService {
                 .orderNumber(orders.getNumber())
                 .orderAmount(orders.getAmount())
                 .build();
+
+//        // 通过webSocket向客户端浏览器推送消息 type orderId content
+//        Map map = new HashMap();
+//        map.put("type",1); // 1表示来单提醒  2表示客户催单
+//        map.put("orderId",orders.getId());
+//        map.put("content","用户提交订单: " + orders.getNumber());
+//
+//        String json = JSON.toJSONString(map);
+//        webSocketServer.sendToAllClient(json);
+
         return orderSubmitVO;
+
+
     }
 
     /**
@@ -152,8 +168,8 @@ public class OrderServiceImpl implements OrderService {
      * @param outTradeNo
      */
     public void paySuccess(String outTradeNo) {
-        // 根据订单号查询订单
-        Orders ordersDB = orderMapper.getByNumber(outTradeNo);
+        Long userId = BaseContext.getCurrentId();
+        Orders ordersDB = orderMapper.getByNumber(outTradeNo,userId);
         // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
         Orders orders = Orders.builder()
                 .id(ordersDB.getId())
@@ -162,6 +178,15 @@ public class OrderServiceImpl implements OrderService {
                 .checkoutTime(LocalDateTime.now())
                 .build();
         orderMapper.update(orders);
+
+        // 通过webSocket向客户端浏览器推送消息 type orderId content
+        Map map = new HashMap();
+        map.put("type",1); // 1表示来单提醒  2表示客户催单
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号: " + outTradeNo);
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     /**
@@ -428,6 +453,15 @@ public class OrderServiceImpl implements OrderService {
                 .deliveryTime(LocalDateTime.now())
                 .build();
         orderMapper.update(orders);
+    }
+
+    /**
+     * 用户催单
+     * @param id
+     */
+    @Override
+    public void urge(Long id) {
+        // TODO 用户催单
     }
 
     private List<OrderVO> getOrderVOList(Page<Orders> page) {

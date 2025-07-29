@@ -20,12 +20,15 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class OrderController {
 
-    /**
-     * 用户下单
-     */
+
     @Autowired
     private OrderService orderService;
 
+    /**
+     * 用户下单
+     * @param ordersSubmitDTO
+     * @return
+     */
     @PostMapping("/submit")
     @ApiOperation("用户下单")
     public Result<OrderSubmitVO> submit(@RequestBody OrdersSubmitDTO ordersSubmitDTO) {
@@ -35,7 +38,6 @@ public class OrderController {
 
     /**
      * 订单支付
-     *
      * @param ordersPaymentDTO
      * @return
      */
@@ -51,7 +53,6 @@ public class OrderController {
 
     /**
      * 历史订单查询
-     *
      * @param page
      * @param pageSize
      * @param status   订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
@@ -67,7 +68,6 @@ public class OrderController {
 
     /**
      * 根据订单id查询订单详情
-     *
      * @param id
      * @return
      */
@@ -93,11 +93,28 @@ public class OrderController {
         return Result.success();
     }
 
+    /**
+     * 再来一单
+     * @param id
+     * @return
+     */
     @PostMapping("/repetition/{id}")
     @ApiOperation("再来一单")
     public Result repetition(@PathVariable Long id){
         log.info("再来一单, 订单id: {}",id);
         orderService.repetition(id);
+        return Result.success();
+    }
+
+    /**
+     * 用户催单
+     * @param id
+     * @return
+     */
+    @GetMapping("reminder/{id}")
+    @ApiOperation("用户催单")
+    public Result hasten(@PathVariable Long id){
+        orderService.urge(id);
         return Result.success();
     }
 }
