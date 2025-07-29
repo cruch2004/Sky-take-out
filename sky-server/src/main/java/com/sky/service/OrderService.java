@@ -105,5 +105,5 @@ public interface OrderService {
      * 用户催单
      * @param id
      */
-    void urge(Long id);
+    void reminder(Long id);
 }

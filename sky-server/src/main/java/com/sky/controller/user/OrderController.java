@@ -113,8 +113,8 @@ public class OrderController {
      */
     @GetMapping("reminder/{id}")
     @ApiOperation("用户催单")
-    public Result hasten(@PathVariable Long id){
-        orderService.urge(id);
+    public Result reminder(@PathVariable Long id){
+        orderService.reminder(id);
         return Result.success();
     }
 }
