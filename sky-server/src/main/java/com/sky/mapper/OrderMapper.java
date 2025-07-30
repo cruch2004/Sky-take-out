@@ -78,7 +78,7 @@ public interface OrderMapper {
      * @param map
      * @return
      */
-    Double sumByMap(Map map);
+    Double getTurnoverByMap(Map map);
 
 
 }

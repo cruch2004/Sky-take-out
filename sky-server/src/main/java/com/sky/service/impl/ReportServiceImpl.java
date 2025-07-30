@@ -1,14 +1,19 @@
 package com.sky.service.impl;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.print.DocFlavor;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,22 +28,20 @@ import java.util.Map;
 public class ReportServiceImpl implements ReportService {
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 统计指定时间区间内的营业额数据
+     *
      * @param begin
      * @param end
      * @return
      */
     @Override
     public TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end) {
-        List<LocalDate> dateList = new ArrayList<>();
-        dateList.add(begin);
-        while (!begin.equals(end)) {
-            begin = begin.plusDays(1);
-            dateList.add(begin);
-        }
-
+        List<LocalDate> dateList = getDateList(begin, end);
+        // 每天的营业额
         List<Double> turnoverList = new ArrayList();
         dateList.forEach(date -> {
             LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
@@ -47,7 +50,7 @@ public class ReportServiceImpl implements ReportService {
             map.put("begin", beginTime);
             map.put("end", endTime);
             map.put("status", Orders.COMPLETED);
-            Double turnover = orderMapper.sumByMap(map);
+            Double turnover = orderMapper.getTurnoverByMap(map);
             turnover = turnover == null ? 0.0 : turnover;
             turnoverList.add(turnover);
         });
@@ -55,5 +58,55 @@ public class ReportServiceImpl implements ReportService {
                 .dateList(StringUtils.join(dateList, ","))
                 .turnoverList(StringUtils.join(turnoverList, ","))
                 .build();
+    }
+
+    /**
+     * 用户接口统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = getDateList(begin, end);
+        List<Integer> totalUserList = new ArrayList();
+        List<Integer> newUserList = new ArrayList<>();
+        dateList.forEach(date -> {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+            Map map = new HashMap();
+            map.put("end", endTime);
+            // 获取用户总量
+            Integer totalUser = userMapper.countUserNumberByMap(map);
+            totalUser = totalUser == null ? 0 : totalUser;
+            // 获取当天新用户数
+            map.put("begin", beginTime);
+            Integer newUser = userMapper.countUserNumberByMap(map);
+            newUser = newUser == null ? 0 : newUser;
+            newUserList.add(newUser);
+            totalUserList.add(totalUser);
+        });
+
+        return UserReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .totalUserList(StringUtils.join(totalUserList, ","))
+                .newUserList(StringUtils.join(newUserList, ","))
+                .build();
+    }
+
+    /**
+     * 获取日期列表
+     * @param begin
+     * @param end
+     * @return
+     */
+    private List<LocalDate> getDateList(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = new ArrayList<>();
+        dateList.add(begin);
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+        return dateList;
     }
 }

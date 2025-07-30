@@ -4,6 +4,9 @@ import com.sky.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+import java.util.Map;
+
 @Mapper
 public interface UserMapper {
     /**
@@ -21,10 +24,17 @@ public interface UserMapper {
     void insert(User user);
 
     /**
-     * 根据user_id查询用户
+     * 根据 user_id查询用户
      * @param userId
      * @return
      */
     @Select("select * from user where id = #{user_id}")
     User getById(Long userId);
+
+    /**
+     * 查询某个时间范围内的用户数
+     * @param map
+     * @return
+     */
+    Integer countUserNumberByMap(Map map);
 }
