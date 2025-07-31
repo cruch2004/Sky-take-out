@@ -25,10 +25,10 @@ public class OrderReportVO implements Serializable {
     //订单总数
     private Integer totalOrderCount;
 
-    //有效订单数
+    //总的有效订单数
     private Integer validOrderCount;
 
-    //订单完成率
+    //总的订单完成率
     private Double orderCompletionRate;
 
 }
