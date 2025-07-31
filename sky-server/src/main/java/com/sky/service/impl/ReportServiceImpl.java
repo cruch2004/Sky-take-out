@@ -1,11 +1,14 @@
 package com.sky.service.impl;
 
 import com.alibaba.druid.support.json.JSONUtils;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
+import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.models.auth.In;
@@ -19,10 +22,8 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,6 +32,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
 
     /**
      * 统计指定时间区间内的营业额数据
@@ -87,6 +90,7 @@ public class ReportServiceImpl implements ReportService {
 
     /**
      * 订单统计接口
+     *
      * @return
      */
     @Override
@@ -131,7 +135,40 @@ public class ReportServiceImpl implements ReportService {
     }
 
     /**
+     * 查询销量排名top10
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
+//        // 商品名称列表
+//        List<String> nameList = new ArrayList();
+//        // 销量列表
+//        List<Integer> numberList = new ArrayList();
+//        salesTop10.forEach(x->{
+//            nameList.add(x.getName());
+//            numberList.add(x.getNumber());
+//        });
+
+        List<String> names = salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        String nameList = StringUtils.join(names, ",");
+        List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+        String numberList = StringUtils.join(numbers, ",");
+
+        return SalesTop10ReportVO.builder()
+                .nameList(nameList)
+                .numberList(numberList)
+                .build();
+    }
+
+    /**
      * 封装日期列表
+     *
      * @param begin
      * @param end
      * @return
@@ -156,11 +193,11 @@ public class ReportServiceImpl implements ReportService {
      */
     private Map encapsulationMap(LocalDate begin, LocalDate end, Integer status) {
         Map map = new HashMap();
-        if (begin != null){
+        if (begin != null) {
             LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
             map.put("begin", beginTime);
         }
-        if (end != null){
+        if (end != null) {
             LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
             map.put("end", endTime);
         }
